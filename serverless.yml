@@ -1,0 +1,52 @@
+service: cripto-alerts
+
+frameworkVersion: '2 || 3'
+
+plugins:
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:*
+      Resource: 
+        - arn:aws:dynamodb:us-east-1:533722823054:table/AlertsTable
+        - arn:aws:dynamodb:us-east-1:533722823054:table/LogsTable
+
+functions:
+  verifyCoinPrices:
+    handler: src/handler.run
+    events:
+      # Invoke Lambda function every fifteen minutes
+      - schedule: cron(30,58 * ? * * *)
+
+resources:
+  Resources:
+    AlertsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: AlertsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S 
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH 
+    LogsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: LogsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S 
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        
