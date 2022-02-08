@@ -1,18 +1,14 @@
 'use strict';
 
+const logsDB = require('./database/logs.dynamodb');
 const sendSMS = require('./helpers/sendSMS');
 const alertsDB = require('./database/alerts.dynamodb');
-const logsDB = require('./database/logs.dynamodb');
-// const getCoinPrices = require('./helpers/getCoinPrices');
-const getCoinPricesApi = require('./helpers/getCoinPricesApi');
 const verifyAlerts = require('./helpers/verifyAlerts');
+const getCoinPricesApi = require('./helpers/getCoinPricesApi');
 
 module.exports.run = async (event, context) => {
-  console.time('lambda');
-
   let messageSMS = '';
   let messageLog = `Cron running ${new Date().toString().substring(0, 24)}`;
-  // const coinPrices = await getCoinPrices();
   const coinPrices = await getCoinPricesApi();
   console.log('coinPrices', coinPrices);
   const alertsActive = await alertsDB.getAlertsActive();
@@ -29,5 +25,4 @@ module.exports.run = async (event, context) => {
   await logsDB.createLog(messageLog);
 
   console.log(messageLog);
-  console.timeEnd('lambda');
 };
