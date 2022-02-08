@@ -48,7 +48,8 @@ const createNextAlert = async (oldAlert) => {
         direction: oldAlert.direction,
         price: calculateNextPrice(oldAlert.price, oldAlert.direction),
         active: true,
-		createdAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+		createdAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+		updatedAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     }
 
     await dynamoDB.put({
@@ -65,9 +66,10 @@ const desactivateAlert = async (alertId) => {
 		Key: { 
 			id: alertId 
 		},
-		UpdateExpression: 'set active = :val',
+		UpdateExpression: 'set active = :val, updatedAt = :date',
 		ExpressionAttributeValues: {
-			':val': false
+			':val': false,
+			':date': dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
 		},
 		ReturnValues: 'ALL_NEW',
 	}).promise();
