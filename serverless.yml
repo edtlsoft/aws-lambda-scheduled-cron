@@ -23,7 +23,8 @@ functions:
     handler: src/handler.run
     events:
       # Invoke Lambda function every fifteen minutes
-      - schedule: cron(30,58 * ? * * *)
+      - schedule: cron(30,58 8-23 ? * * *)
+      - schedule: cron(58 0-7 ? * * *)
 
 resources:
   Resources:
