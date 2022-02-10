@@ -41,15 +41,15 @@ const calculateNextPrice = (oldPrice, oldDirection) => {
     return oldDirection === 1 ? (oldPrice - priceOfVariation) : (oldPrice + priceOfVariation);
 }
 
-const createNextAlert = async (oldAlert) => {
+const createNextAlert = async (alert, direction) => {
     let Item = {
         id: uuidv4(),
-        pair: oldAlert.pair,
-        direction: oldAlert.direction,
-        price: calculateNextPrice(oldAlert.price, oldAlert.direction),
+        pair: alert.pair,
+        direction: direction,
+        price: calculateNextPrice(alert.price, direction),
         active: true,
-		createdAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-		updatedAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        createdAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        updatedAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     }
 
     await dynamoDB.put({

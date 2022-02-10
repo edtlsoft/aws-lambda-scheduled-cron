@@ -6,10 +6,14 @@ const asyncForEach = async (items, callback) => {
     }
 }
 
-const createNextAlert = async (alert) => {
-    const newAlert = await alertsDB.createNextAlert(alert);
+const createNextAlerts = async (alert) => {
+    const buyAlert = await alertsDB.createNextAlert(alert, 1);
+    const sellAlert = await alertsDB.createNextAlert(alert, 2);
     await alertsDB.desactivateAlert(alert.id);
-    return newAlert;
+    return {
+        buyAlert,
+        sellAlert
+    };
 }
 
 const verifyAlerts = async (alerts=[], coinPrices={}) => {
@@ -18,15 +22,21 @@ const verifyAlerts = async (alerts=[], coinPrices={}) => {
     await asyncForEach(alerts, async (alert) => {
         // const coinPrice = coinPrices[alert.pair];
         const coinPrice = coinPrices;
+        let alertSMSMessage = '';
     
         if (alert.direction === 1 && alert.price > coinPrice.min) {
-          const newAlert = await createNextAlert(alert);
-          messageSMS += `BTC comprado a ${alert.price} USDT, debes generar una nueva orden de compra por ${newAlert.price} USDT.`;
+          alertSMSMessage += `BTC comprado a ${alert.price} USDT`;
         }
         else if(alert.direction === 2 && alert.price < coinPrice.max) {
-          const newAlert = await createNextAlert(alert);
-          messageSMS += `BTC vendido a ${alert.price} USDT, debes generar una nueva orden de venta por ${newAlert.price} USDT.`;
+          alertSMSMessage += `BTC vendido a ${alert.price} USDT`;
         }
+
+        if (alertSMSMessage != '') {
+            const { buyAlert, sellAlert} = await createNextAlerts(alert);
+            alertSMSMessage += `, nueva orden de compra ${buyAlert.price} USDT, nueva orden de venta ${sellAlert.price} USDT.`;
+        }
+
+        messageSMS += alertSMSMessage;
     });
 
     return messageSMS;
