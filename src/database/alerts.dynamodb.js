@@ -23,9 +23,9 @@ const getAlertsActive = async () => {
     const alerts = await dynamoDB
         .scan({
             TableName,
-            FilterExpression: "active = :val",
+            FilterExpression: "active = :active",
             ExpressionAttributeValues: {
-                ":val": true
+                ":active": true
             }
         })
         .promise();
@@ -52,13 +52,31 @@ const createNextAlert = async (alert, direction) => {
         updatedAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     }
 
-    await dynamoDB.put({
-		TableName,
-		Item,
-	}).promise();
+	const alertNotExists = await validateIfAlertExists(Item);
 
-    return Item;
+	if (!alertNotExists) {
+		await dynamoDB.put({ TableName, Item }).promise();
+		return Item;
+	}
+
+	return null;
 }
+
+const validateIfAlertExists = async (alert) => {
+    const alerts = await dynamoDB
+        .scan({
+            TableName,
+            FilterExpression: "price = :price AND direction = :direction AND active = :active",
+            ExpressionAttributeValues: {
+                ":price": alert.price,
+                ":direction": alert.direction,
+                ":active": alert.active
+            }
+        })
+        .promise();
+	
+	return alerts.Items.length;
+};
 
 const desactivateAlert = async (alertId) => {
 	return dynamoDB.update({
@@ -66,9 +84,9 @@ const desactivateAlert = async (alertId) => {
 		Key: { 
 			id: alertId 
 		},
-		UpdateExpression: 'set active = :val, updatedAt = :date',
+		UpdateExpression: 'set active = :active, updatedAt = :date',
 		ExpressionAttributeValues: {
-			':val': false,
+			':active': false,
 			':date': dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
 		},
 		ReturnValues: 'ALL_NEW',

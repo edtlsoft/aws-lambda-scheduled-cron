@@ -7,11 +7,12 @@ const exchange = process.env.NOMICS_EXCHANGE;
 const market = 'BTCUSDT';
 
 const getCoinPricesApi = async () => {
-    const currentDate = new Date();
-    let startDate = dateFns.format(currentDate, 'yyyy-MM-dd') + 'T00:00:00Z';
-    let finalDate = dateFns.format(dateFns.add(currentDate, { days: 1 }), 'yyyy-MM-dd') + 'T23:59:59Z';
+    const currentDate = dateFns.sub(new Date(), { hours: 1 });
+    const dateAdd1hour = dateFns.add(new Date(), { hours: 5 });
+    let startDate = `${dateFns.format(currentDate, 'yyyy-MM-dd')}T${dateFns.format(currentDate, 'HH:mm:ss')}Z`;
+    let finalDate = `${dateFns.format(dateAdd1hour, 'yyyy-MM-dd')}T${dateFns.format(dateAdd1hour, 'HH:mm:ss')}Z`;
     let url = `https://api.nomics.com/v1/exchange_candles?key=${apiKey}&interval=${interval}&exchange=${exchange}&market=${market}&start=${startDate}&end=${finalDate}`;
-
+    
     let response = await fetch(url);
     let data = await response.json();
 
