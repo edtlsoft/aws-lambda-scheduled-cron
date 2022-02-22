@@ -2,7 +2,11 @@ service: cripto-alerts
 
 frameworkVersion: '2 || 3'
 
+package:
+  individually: true
+
 plugins:
+  - serverless-webpack
   - serverless-dotenv-plugin
 
 provider:
@@ -17,6 +21,11 @@ provider:
       Resource: 
         - arn:aws:dynamodb:us-east-1:533722823054:table/AlertsTable
         - arn:aws:dynamodb:us-east-1:533722823054:table/LogsTable
+
+custom:
+  webpack:
+    webpackConfig: './webpack.config.js'
+    includeModules: false
 
 functions:
   verifyCoinPrices:
