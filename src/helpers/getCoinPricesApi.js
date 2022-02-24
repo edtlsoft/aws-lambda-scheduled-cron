@@ -13,8 +13,17 @@ const getCoinPricesApi = async () => {
     let finalDate = `${dateFns.format(dateAdd1hour, 'yyyy-MM-dd')}T${dateFns.format(dateAdd1hour, 'HH:mm:ss')}Z`;
     let url = `https://api.nomics.com/v1/exchange_candles?key=${apiKey}&interval=${interval}&exchange=${exchange}&market=${market}&start=${startDate}&end=${finalDate}`;
     
-    let response = await fetch(url);
-    let data = await response.json();
+    const response = await fetch(url);
+
+    if (response.status != 200) {
+        throw new Error(`Nomics API: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+
+    if (data.length === 0) {
+        throw new Error('Nomics API: Response JSON is empty');
+    }
 
     const lastHour = data[data.length - 1];
 
