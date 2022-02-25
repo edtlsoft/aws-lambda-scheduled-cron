@@ -17,7 +17,7 @@ const verifyAlertsByPair = async (coinPair) => {
     const alertsActive = await alertsDB.getAlertsActiveByPair(coinPair);
     const logsVerifyAlerts = await verifyAlerts(alertsActive, coinPrices, coinPair);
 
-    return `coinPair: ${coinPair.pair} || coinPrices: ${JSON.stringify(coinPrices)} || logsVerifyAlerts: ${logsVerifyAlerts} === `;
+    return `coinPair: ${coinPair.pair} || coinPrices: ${JSON.stringify(coinPrices)} || logsVerifyAlerts: ${logsVerifyAlerts} \n=====\n`;
 }
 
 const verifyAlertsByCoinPair = async (coinPairs) => {
