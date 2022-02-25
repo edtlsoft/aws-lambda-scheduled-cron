@@ -1,20 +1,14 @@
 'use strict';
 
-const logsDB = require('./database/logs.dynamodb');
-const alertsDB = require('./database/alerts.dynamodb');
-const verifyAlerts = require('./helpers/verifyAlerts');
-const getCoinPricesApi = require('./helpers/getCoinPricesApi');
+const coinPairsDB = require('./database/coinPairs.dynamodb');
+const verifyAlertsByCoinPair = require('./helpers/verifyAlertsByCoinPair');
 
 module.exports.run = async (event, context) => {
   let messageLog = `Cron running ${new Date().toString().substring(0, 24)}`;
-  const coinPrices = await getCoinPricesApi();
-  const alertsActive = await alertsDB.getAlertsActive();
+  const coinPairs = await coinPairsDB.getCoinPairsActive();
+  const logsVerifyAlerts = await verifyAlertsByCoinPair(coinPairs);
 
-  const logsVerifyAlerts = await verifyAlerts(alertsActive, coinPrices);
-
-  messageLog += ` || coinPrices: ${JSON.stringify(coinPrices)} || logsVerifyAlerts: ${logsVerifyAlerts}`;
-
-  // await logsDB.createLog(messageLog);
+  messageLog += ` || logsVerifyAlerts: ${logsVerifyAlerts}`;
 
   console.log(messageLog);
 };

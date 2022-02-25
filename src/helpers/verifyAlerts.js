@@ -7,9 +7,9 @@ const asyncForEach = async (items, callback) => {
     }
 }
 
-const createNextAlerts = async (alert) => {
-    const buyAlert = await alertsDB.createNextAlert(alert, 1);
-    const sellAlert = await alertsDB.createNextAlert(alert, 2);
+const createNextAlerts = async (alert, coinPair) => {
+    const buyAlert = await alertsDB.createNextAlert(alert, 1, coinPair);
+    const sellAlert = await alertsDB.createNextAlert(alert, 2, coinPair);
     await alertsDB.desactivateAlert(alert.id);
     return {
         buyAlert,
@@ -17,13 +17,12 @@ const createNextAlerts = async (alert) => {
     };
 }
 
-const verifyAlerts = async (alerts=[], coinPrices={}) => {
+const verifyAlerts = async (alerts=[], coinPrices={}, coinPair={}) => {
     let logsVerifyAlerts = '';
 
     await asyncForEach(alerts, async (alert) => {
-        // const coinPrice = coinPrices[alert.pair];
-        const coinPrice = coinPrices;
         let messageSMS = '';
+        const coinPrice = coinPrices;
     
         if (alert.direction === 1 && alert.price > coinPrice.min) {
           messageSMS += `BTC comprado a ${alert.price} USDT`;
@@ -33,7 +32,7 @@ const verifyAlerts = async (alerts=[], coinPrices={}) => {
         }
 
         if (messageSMS != '') {
-            const { buyAlert, sellAlert} = await createNextAlerts(alert);
+            const { buyAlert, sellAlert} = await createNextAlerts(alert, coinPair);
             messageSMS += buyAlert  ? `, nueva orden de compra ${buyAlert.price} USDT` : '';
             messageSMS += sellAlert ? `, nueva orden de venta ${sellAlert.price} USDT.` : '';
             const sendAlertSMS = await sendSMS(messageSMS, process.env.MY_PHONE_NUMBER);

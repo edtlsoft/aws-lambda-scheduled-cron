@@ -20,7 +20,7 @@ provider:
         - dynamodb:*
       Resource: 
         - arn:aws:dynamodb:us-east-1:533722823054:table/AlertsTable
-        - arn:aws:dynamodb:us-east-1:533722823054:table/LogsTable
+        - arn:aws:dynamodb:us-east-1:533722823054:table/CoinsTable
 
 custom:
   webpack:
@@ -48,6 +48,17 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH 
+    CoinPairsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: CoinPairsTable
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+            - AttributeName: id
+              AttributeType: S 
+          KeySchema:
+            - AttributeName: id
+              KeyType: HASH 
     LogsTable:
       Type: AWS::DynamoDB::Table
       Properties:

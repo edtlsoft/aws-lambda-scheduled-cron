@@ -33,20 +33,45 @@ const getAlertsActive = async () => {
   return alerts.Items;
 };
 
-const calculateNextPrice = (oldPrice, oldDirection) => {
-    const multipleBase = Math.pow(10, oldPrice.toString().length - 1);
-    const priceBase = parseInt(oldPrice / multipleBase) * multipleBase;
-    const priceOfVariation = priceBase / 100 * process.env.TRADING_PERCENTAGE_OF_VARIATION;
+const getAlertsActiveByPair = async (coinPair) => {
+    const alerts = await dynamoDB
+        .scan({
+            TableName,
+            FilterExpression: "pair = :pair AND active = :active ",
+            ExpressionAttributeValues: {
+                ":pair": coinPair.pair,
+                ":active": true,
+            }
+        })
+        .promise();
 
-    return oldDirection === 1 ? (oldPrice - priceOfVariation) : (oldPrice + priceOfVariation);
+  return alerts.Items;
+};
+
+const calculateNextPrice = (oldPrice, direction, coinPair) => {
+    let newPrice = 0;
+    console.log('coinPair:::', coinPair);
+
+    if (direction === 1) {
+        const variationToBuy = parseFloat(coinPair.variation_to_buy);
+        newPrice = oldPrice - variationToBuy;
+        console.log('oldPrice - variationToBuy:::', oldPrice, variationToBuy, coinPair.variation_to_buy);
+    }
+    else if (direction === 2) {
+        const variationToSell = parseFloat(coinPair.variation_to_sell);
+        newPrice = oldPrice + variationToSell;
+        console.log('oldPrice + variationToBuy:::', oldPrice, variationToBuy, coinPair.variation_to_sell);
+    }
+
+    return newPrice;
 }
 
-const createNextAlert = async (alert, direction) => {
+const createNextAlert = async (alert, direction, coinPair) => {
     let Item = {
         id: uuidv4(),
         pair: alert.pair,
         direction: direction,
-        price: calculateNextPrice(alert.price, direction),
+        price: calculateNextPrice(alert.price, direction, coinPair),
         active: true,
         createdAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         updatedAt: dateFns.format(new Date(), 'yyyy-MM-dd HH:mm:ss')
@@ -96,6 +121,7 @@ const desactivateAlert = async (alertId) => {
 module.exports = {
   getAlerts,
   getAlertsActive,
+  getAlertsActiveByPair,
   createNextAlert,
   desactivateAlert,
 };
