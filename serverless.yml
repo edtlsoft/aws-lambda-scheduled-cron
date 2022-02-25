@@ -20,7 +20,7 @@ provider:
         - dynamodb:*
       Resource: 
         - arn:aws:dynamodb:us-east-1:533722823054:table/AlertsTable
-        - arn:aws:dynamodb:us-east-1:533722823054:table/CoinsTable
+        - arn:aws:dynamodb:us-east-1:533722823054:table/CoinPairsTable
 
 custom:
   webpack:
