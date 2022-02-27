@@ -50,17 +50,14 @@ const getAlertsActiveByPair = async (coinPair) => {
 
 const calculateNextPrice = (oldPrice, direction, coinPair) => {
     let newPrice = 0;
-    console.log('coinPair:::', coinPair);
 
     if (direction === 1) {
         const variationToBuy = parseFloat(coinPair.variation_to_buy);
         newPrice = oldPrice - variationToBuy;
-        console.log('oldPrice - variationToBuy:::', oldPrice, variationToBuy, coinPair.variation_to_buy);
     }
     else if (direction === 2) {
         const variationToSell = parseFloat(coinPair.variation_to_sell);
         newPrice = oldPrice + variationToSell;
-        console.log('oldPrice + variationToBuy:::', oldPrice, variationToBuy, coinPair.variation_to_sell);
     }
 
     return newPrice;

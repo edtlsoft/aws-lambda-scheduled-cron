@@ -25,10 +25,10 @@ const verifyAlerts = async (alerts=[], coinPrices={}, coinPair={}) => {
         const coinPrice = coinPrices;
     
         if (alert.direction === 1 && alert.price > coinPrice.min) {
-          messageSMS += `BTC comprado a ${alert.price} USDT`;
+          messageSMS += `${coinPair.pair} comprado a ${alert.price} USDT`;
         }
         else if(alert.direction === 2 && alert.price < coinPrice.max) {
-          messageSMS += `BTC vendido a ${alert.price} USDT`;
+          messageSMS += `${coinPair.pair} vendido a ${alert.price} USDT`;
         }
 
         if (messageSMS != '') {
@@ -38,6 +38,8 @@ const verifyAlerts = async (alerts=[], coinPrices={}, coinPair={}) => {
             const sendAlertSMS = await sendSMS(messageSMS, process.env.MY_PHONE_NUMBER);
             messageSMS += ` || SMS: ${sendAlertSMS}`;
         }
+
+        console.log('messageSMS:::', messageSMS);
 
         logsVerifyAlerts += messageSMS;
     });
