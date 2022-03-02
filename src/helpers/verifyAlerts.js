@@ -39,8 +39,6 @@ const verifyAlerts = async (alerts=[], coinPrices={}, coinPair={}) => {
             messageSMS += ` || SMS: ${sendAlertSMS}`;
         }
 
-        console.log('messageSMS:::', messageSMS);
-
         logsVerifyAlerts += messageSMS;
     });
 
