@@ -48,6 +48,12 @@ const getAlertsActiveByPair = async (coinPair) => {
   return alerts.Items;
 };
 
+const parseFloatWithDecimals = (value, decimals=0) => {
+    const exponential = Math.pow(10, decimals);
+    value = parseFloat(value);
+    return Math.round(value * exponential) / exponential;
+}
+
 const calculateNextPrice = (oldPrice, direction, coinPair) => {
     let newPrice = 0;
 
@@ -60,7 +66,7 @@ const calculateNextPrice = (oldPrice, direction, coinPair) => {
         newPrice = oldPrice + variationToSell;
     }
 
-    return newPrice;
+    return parseFloatWithDecimals(newPrice, coinPair.price_decimals);
 }
 
 const createNextAlert = async (alert, direction, coinPair) => {
